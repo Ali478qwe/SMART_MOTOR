@@ -5,10 +5,13 @@
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 
+unsigned long previousMillis = 0;
+const long interval = 200;
 
-
-const char* ssid = "ESP32_WS_AP";
+const char* ssid = "َc++";
 const char* password = "12345678";
+
+const char * file = "/index.html";
 
 AsyncWebServer server(80);
 AsyncWebSocket web_socket("/ws");
@@ -79,16 +82,16 @@ void initSPIFFS() {
     return;
   }
   Serial.println("SPIFFS mounted successfully");
-  // if (SPIFFS.exists(file_name)) {
-  //   Serial.println("file exists");
-  // } else {
-  //   Serial.println("file not found");
-  // }
+  if (SPIFFS.exists(file)) {
+    Serial.println("file exists");
+  } else {
+    Serial.println("file not found");
+  }
 }
 
 void setup(){
   Serial.begin(115200);
-  WiFi.softAPConfig(local_IP, gateway, subnet);
+  // WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
@@ -97,8 +100,15 @@ void setup(){
   server.addHandler(&web_socket);
 
   initSPIFFS();
+  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+  // server.serveStatic("/", SPIFFS, file);
+// server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+//     File file = SPIFFS.open("/index.html", "r");
+//    AsyncWebServerResponse *response =
+//     request->beginResponse(file, String("/index.html"), String("text/html"));
+//     request->send(response);
+// });
 
-  server.serveStatic("/", SPIFFS, "/index.html");
 
 
 
@@ -108,6 +118,13 @@ void setup(){
 }
 
 void loop(){
-  Read_Sensor();
-  delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
+  // Read_Sensor();
+  // delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillis >= interval){
+    previousMillis = currentMillis;
+    Read_Sensor();
+  }
+  web_socket.cleanupClients(); // نگهداری از WebSocket‌ها
+
 }

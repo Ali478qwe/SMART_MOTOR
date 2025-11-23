@@ -1,12 +1,17 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <FS.h>
+#include <LittleFS.h>
+#include <ArduinoJson.h>
+
+
 
 const char* ssid = "ESP32_WS_AP";
 const char* password = "12345678";
 
 AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
+AsyncWebSocket web_socket("/ws");
 
 //create a customer class from websocket header
 
@@ -18,14 +23,14 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     Serial.printf("Received WS message: %s\n", msg.c_str());
 
     if (msg == "PING") {
-      ws.textAll("PONG");
+      web_socket.textAll("PONG");
     }
   }
 }
 
 //create a customer class from websocket header
 
-void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
+void web_socket_handler(AsyncWebSocket * server, AsyncWebSocketClient * client,
              AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
     case WS_EVT_CONNECT:
@@ -43,32 +48,26 @@ void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
   }
 }
 
-const char html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>ESP32 WebSocket Demo</title>
-  </head>
-  <body>
-    <h2>Analog Value (via WebSocket):</h2>
-    <p id="val">---</p>
-    <button onclick="sendPing()">Send PING</button>
-    <script>
-      var websocket = new WebSocket('ws://' + location.host + '/ws');
-      websocket.onopen = function(event) {
-        console.log('WebSocket open');
-      };
-      websocket.onmessage = function(event) {
-        document.getElementById('val').innerText = event.data;
-      };
-      function sendPing() {
-        websocket.send('PING');
-      }
-    </script>
-  </body>
-</html>
-)rawliteral";
+void Read_Sensor(void){
+  float level_oil = analogRead(26);
+  float temp_oil = analogRead(14);
+  float temp_air = analogRead(27);
+  float voltage_battery = analogRead(12);
+
+  StaticJsonDocument<200> json;
+
+  json["level_oil"] = level_oil;
+  json["temp_oil"] = temp_oil;
+  json["temp_air"] = temp_air;
+  json["voltage_battery"] = voltage_battery;
+  
+  String output;
+
+  serializeJson(json , output);
+
+  web_socket.textAll(output);
+
+}
 
 void setup(){
   Serial.begin(115200);
@@ -76,18 +75,24 @@ void setup(){
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
 
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
+  web_socket.onEvent(web_socket_handler);
+  server.addHandler(&web_socket);
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", html);
-  });
+  if (!LittleFS.begin()) {
+    Serial.println("LittleFS Mount Failed");
+    return;
+}
+
+server.serveStatic("/", LittleFS, "/");
+
+
+
+
 
   server.begin();
 }
 
 void loop(){
-  int analogValue = analogRead(34);  // مثال: پین 34 برای ADC
-  ws.textAll(String(analogValue));
+  Read_Sensor();
   delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
 }

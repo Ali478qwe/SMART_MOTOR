@@ -104,6 +104,16 @@
     </div>
     </body>
     <script>
+        const socket = new WebSocket("ws://192.168.4.1/ws");
+
+        socket.onopen = ()=>{
+            console.log("web socket connected");
+            socket.sned("websocket in brower runing");
+        };
+
+        socket.onmessage = (event)=>{
+            console.log("message from esp:",event.data);
+        }
 
     </script>
 </htm>

@@ -54,35 +54,69 @@
             </div>
         </div>
     <div class="management">
-        <div class="notification flex_row center gap">
+        <div class="notification flex_column center">
+            <div class="data flex_row center">
+                <img class="icon" src="icon/list.png">
+                <h1>DATA</h1>
+
+            </div>
+            <div class="notif_item_box flex center gap_10">
                 <div class="flex_column gap">
-                    <div class="flex_row center gap_10">
+                    <div class="notif_box flex_row center gap_10">
                         <div class="dot" style="background-color: orange;"></div>
                         <h4>message</h4>
                     </div>
-                    <div class="flex_row center gap_10">
+                    <div class="notif_box flex_row center gap_10">
                         <div class="dot" style="background-color: red;"></div>
                         <h4>sim ok</h4>
                     </div>
-                    <div class="flex_row center gap_10">
-                    <div class="dot" style="background-color: yellowgreen"></div>
-                    <h4>message</h4>
+                    <div class="notif_box flex_row center gap_10">
+                        <div class="dot" style="background-color: yellowgreen"></div>
+                        <h4>message</h4>
+                        </div>    
+                </div>
+                <div class="flex_column gap">
+                    <div class="notif_box flex_row center gap_10">
+                        <div class="dot" style="background-color:darkmagenta;"></div>
+                        <h4>charge</h4>
+                    </div>
+                    <div class="notif_box flex_row center gap_10">
+                        <div class="dot" style="background-color:lightseagreen;"></div>
+                        <h4>call notif</h4>
+                    </div>
+                    <div class="notif_box flex_row center gap_10">
+                        <div class="dot" style="background-color:lightcoral;"></div>
+                        <h4>password</h4>
                     </div>    
                 </div>
                 <div class="flex_column gap">
-                <div class="flex_row center">
-                    <div class="dot" style="background-color:darkmagenta;"></div>
+                    <div class="notif_box flex_row center gap_10">
+                        <div class="dot" style="background-color:brown;"></div>
+                        <h4>message</h4>
+                    </div>
+                    <div class="notif_box flex_row center gap_10">
+                        <div class="dot" style="background-color:cornflowerblue;"></div>
+                        <h4>sim ok</h4>
+                    </div>
+                    <div class="notif_box flex_row center gap_10">
+                        <div class="dot" style="background-color: gold;"></div>
+                        <h4>message</h4>
+                    </div>    
                 </div>
-                <div class="flex_row center">
-                    <div class="dot" style="background-color:lightseagreen;"></div>
-                </div>
-                <div class="flex_row center">
-                   <div class="dot" style="background-color:lightcoral;"></div>
-                </div>    
-            </div>
-
         </div>
-        <div class="sim"></div>
+    </div>
+        <div class="runtime flex_column center">
+           
+        <div class="flex_row heigth">
+         <img class="control_icon" src="icon/time.png">
+        <h2>Run Time</h2>
+        
+        </div>
+        <div class="count_bar flex_row center">
+           <h1>23</h1>
+           <h3>.min</h3>
+        </div>
+        </div>
         <div class="battery zero_margin flex_column center">
         <div class="flex_row heigth">
         <img src="icon/battery.png" class="control_icon">
@@ -100,11 +134,13 @@
             <div class="flex center"><img  src="icon/phone.png" class="control_icon"></div>
             <div class="flex center"><img  src="icon/check_mark.png" class="control_icon"></div>
         </div>
-        <div class="noting"></div>
+        <div class="noting">
+            <hr class="i">
+        </div>
     </div>
     </body>
     <script>
-        const socket = new WebSocket("ws://192.168.4.1/ws");
+                const socket = new WebSocket("ws://192.168.4.1/ws");
 
         socket.onopen = ()=>{
             console.log("web socket connected");
@@ -114,6 +150,5 @@
         socket.onmessage = (event)=>{
             console.log("message from esp:",event.data);
         }
-
     </script>
 </htm>

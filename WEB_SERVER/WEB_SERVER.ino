@@ -1,12 +1,24 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <FS.h>
+#include <SPIFFS.h>
+#include <ArduinoJson.h>
 
-const char* ssid = "ESP32_WS_AP";
+unsigned long previousMillis = 0;
+const long interval = 200;
+
+const char* ssid = "َc++";
 const char* password = "12345678";
 
+const char * file = "/index.html";
+
 AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
+AsyncWebSocket web_socket("/ws");
+
+IPAddress local_IP(192, 168, 4, 1);
+IPAddress gateway(192, 168, 4, 1);
+IPAddress subnet(255, 255, 255, 0);
 
 //create a customer class from websocket header
 
@@ -18,14 +30,14 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     Serial.printf("Received WS message: %s\n", msg.c_str());
 
     if (msg == "PING") {
-      ws.textAll("PONG");
+      web_socket.textAll("PONG");
     }
   }
 }
 
 //create a customer class from websocket header
 
-void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
+void web_socket_handler(AsyncWebSocket * server, AsyncWebSocketClient * client,
              AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
     case WS_EVT_CONNECT:
@@ -43,51 +55,76 @@ void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
   }
 }
 
-const char html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>ESP32 WebSocket Demo</title>
-  </head>
-  <body>
-    <h2>Analog Value (via WebSocket):</h2>
-    <p id="val">---</p>
-    <button onclick="sendPing()">Send PING</button>
-    <script>
-      var websocket = new WebSocket('ws://' + location.host + '/ws');
-      websocket.onopen = function(event) {
-        console.log('WebSocket open');
-      };
-      websocket.onmessage = function(event) {
-        document.getElementById('val').innerText = event.data;
-      };
-      function sendPing() {
-        websocket.send('PING');
-      }
-    </script>
-  </body>
-</html>
-)rawliteral";
+void Read_Sensor(void){
+  float level_oil = analogRead(26);
+  float temp_oil = analogRead(14);
+  float temp_air = analogRead(27);
+  float voltage_battery = analogRead(12);
+
+  StaticJsonDocument<200> json;
+
+  json["level_oil"] = level_oil;
+  json["temp_oil"] = temp_oil;
+  json["temp_air"] = temp_air;
+  json["voltage_battery"] = voltage_battery;
+  
+  String output;
+
+  serializeJson(json , output);
+
+  web_socket.textAll(output);
+
+}
+
+void initSPIFFS() {
+  if (!SPIFFS.begin(false)) {
+    Serial.println("An error has occurred while mounting SPIFFS");
+    return;
+  }
+  Serial.println("SPIFFS mounted successfully");
+  if (SPIFFS.exists(file)) {
+    Serial.println("file exists");
+  } else {
+    Serial.println("file not found");
+  }
+}
 
 void setup(){
   Serial.begin(115200);
+  // WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
 
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
+  web_socket.onEvent(web_socket_handler);
+  server.addHandler(&web_socket);
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", html);
-  });
+  initSPIFFS();
+  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+  // server.serveStatic("/", SPIFFS, file);
+// server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+//     File file = SPIFFS.open("/index.html", "r");
+//    AsyncWebServerResponse *response =
+//     request->beginResponse(file, String("/index.html"), String("text/html"));
+//     request->send(response);
+// });
+
+
+
+
+
 
   server.begin();
 }
 
 void loop(){
-  int analogValue = analogRead(34);  // مثال: پین 34 برای ADC
-  ws.textAll(String(analogValue));
-  delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
+  // Read_Sensor();
+  // delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillis >= interval){
+    previousMillis = currentMillis;
+    Read_Sensor();
+  }
+  web_socket.cleanupClients(); // نگهداری از WebSocket‌ها
+
 }

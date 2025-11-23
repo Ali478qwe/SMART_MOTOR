@@ -13,6 +13,10 @@ const char* password = "12345678";
 AsyncWebServer server(80);
 AsyncWebSocket web_socket("/ws");
 
+IPAddress local_IP(192, 168, 4, 1);
+IPAddress gateway(192, 168, 4, 1);
+IPAddress subnet(255, 255, 255, 0);
+
 //create a customer class from websocket header
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -71,6 +75,7 @@ void Read_Sensor(void){
 
 void setup(){
   Serial.begin(115200);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());

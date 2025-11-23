@@ -2,7 +2,7 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <FS.h>
-#include <LittleFS.h>
+#include <SPIFFS.h>
 #include <ArduinoJson.h>
 
 
@@ -73,6 +73,19 @@ void Read_Sensor(void){
 
 }
 
+void initSPIFFS() {
+  if (!SPIFFS.begin(false)) {
+    Serial.println("An error has occurred while mounting SPIFFS");
+    return;
+  }
+  Serial.println("SPIFFS mounted successfully");
+  // if (SPIFFS.exists(file_name)) {
+  //   Serial.println("file exists");
+  // } else {
+  //   Serial.println("file not found");
+  // }
+}
+
 void setup(){
   Serial.begin(115200);
   WiFi.softAPConfig(local_IP, gateway, subnet);
@@ -83,12 +96,9 @@ void setup(){
   web_socket.onEvent(web_socket_handler);
   server.addHandler(&web_socket);
 
-  if (!LittleFS.begin()) {
-    Serial.println("LittleFS Mount Failed");
-    return;
-}
+  intiSPIFFS();
 
-server.serveStatic("/", LittleFS, "/");
+  server.serveStatic("/", SPIFFS, "/index.html");
 
 
 

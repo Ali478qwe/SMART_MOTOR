@@ -96,7 +96,7 @@ void setup(){
   web_socket.onEvent(web_socket_handler);
   server.addHandler(&web_socket);
 
-  intiSPIFFS();
+  initSPIFFS();
 
   server.serveStatic("/", SPIFFS, "/index.html");
 

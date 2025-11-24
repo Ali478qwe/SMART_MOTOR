@@ -150,7 +150,7 @@
     document.getElementById("voltage_battery").innerText = data.voltage_battery;
 }
 
-const socket = new WebSocket("ws://192.168.4.1/ws");
+const socket = new WebSocket("ws://localhost:8080");
 
 // وقتی اتصال باز شد
 socket.addEventListener("open", () => {

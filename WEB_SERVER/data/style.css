@@ -77,7 +77,7 @@ body{
     background-repeat: no-repeat;
     background-size: cover; 
     background-position: 50% 50%;
-    margin: 50px auto;
+    margin: 50px auto 10px auto;
     justify-content: space-between;
     height: 300px;
     width: 900px;
@@ -106,7 +106,7 @@ body{
 .item{ 
     background-color: #FFF8DE;/*rgba(243, 243, 243, 0.705)*/
     color: rgba(255, 0, 0, 0.918);
-    /* font-family: GOOGLE; */
+    font-family: GOOGLE;
     height: 250px;
     width: 270px;
     border-radius: 50px;

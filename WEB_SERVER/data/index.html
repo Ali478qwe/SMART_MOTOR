@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<htm>
+<html>
 
     <head>
         <title>web app</title>
@@ -7,6 +7,7 @@
     </head>
 
     <body>
+        <!-- <div class="flex_column"> -->
         <!--firsrbar -->
         <div class="header flex_row">
             <!-- account -->
@@ -28,7 +29,7 @@
                     <h2>Temp Oil</h2>
                 </div>
                 <div class="count_bar flex_row center">
-                <h1>50</h1>
+                <h1 id="temp_oil">50</h1>
                 <h3>.c</h3>
             </div>
             </div>
@@ -38,7 +39,7 @@
                     <h2>Level Oil</h2>
                     </div>
           <div class="count_bar flex_row center">
-                <h1>1.5</h1>
+                <h1 id="level_oil">1.5</h1>
                 <h3>.li</h3>
             </div>
             </div>
@@ -48,7 +49,7 @@
                     <h2>Temp Air</h2>
                 </div>
             <div class="count_bar flex_row center">
-                <h1>50</h1>
+                <h1 id="temp_air">50</h1>
                 <h3>.c</h3>
             </div>
             </div>
@@ -124,7 +125,7 @@
         
         </div>
         <div class="count_bar flex_row center">
-           <h1>50</h1>
+           <h1 id="voltage_battery">50</h1>
            <h3>.volt</h3>
         </div>
         </div>
@@ -135,20 +136,42 @@
             <div class="flex center"><img  src="icon/check_mark.png" class="control_icon"></div>
         </div>
         <div class="noting">
-            <hr class="i">
+            <h1 id="cmd"></h1>
         </div>
     </div>
+    <!-- </div> -->
     </body>
     <script>
-                const socket = new WebSocket("ws://192.168.4.1/ws");
 
-        socket.onopen = ()=>{
-            console.log("web socket connected");
-            socket.sned("websocket in brower runing");
-        };
+        function updateUI(data) {
+    document.getElementById("level_oil").innerText = data.level_oil;
+    document.getElementById("temp_oil").innerText = data.temp_oil;
+    document.getElementById("temp_air").innerText = data.temp_air;
+    document.getElementById("voltage_battery").innerText = data.voltage_battery;
+}
 
-        socket.onmessage = (event)=>{
-            console.log("message from esp:",event.data);
-        }
+const socket = new WebSocket("ws://192.168.4.1/ws");
+
+// وقتی اتصال باز شد
+socket.addEventListener("open", () => {
+    console.log("Connected to ESP32 WebSocket");
+});
+
+// وقتی پیامی دریافت شد
+socket.addEventListener("message", (event) => {
+    console.log("Data received from ESP32:", event.data);
+    try {
+        const json = JSON.parse(event.data);
+        updateUI(json); // داده‌ها را به UI منتقل کن
+    } catch (e) {
+        console.error("Invalid JSON", e);
+    }
+});
+
+// وقتی اتصال بسته شد
+socket.addEventListener("close", () => {
+    console.log("WebSocket closed");
+});
+
     </script>
-</htm>
+</html>

@@ -5,13 +5,20 @@
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 
+bool flag = true; 
+
 unsigned long previousMillis = 0;
-const long interval = 200;
+const long interval = 1000;
 
 const char* ssid = "َc++";
 const char* password = "12345678";
 
 const char * file = "/index.html";
+
+uint8_t PIN_TEMP_OIL = 32;
+uint8_t PIN_TEMP_AIR = 33;
+uint8_t PIN_LEVEL_OIL = 34;
+uint8_t PIN_VOLTAGE_BATTERY = 35;
 
 AsyncWebServer server(80);
 AsyncWebSocket web_socket("/ws");
@@ -56,17 +63,22 @@ void web_socket_handler(AsyncWebSocket * server, AsyncWebSocketClient * client,
 }
 
 void Read_Sensor(void){
-  float level_oil = analogRead(26);
-  float temp_oil = analogRead(14);
-  float temp_air = analogRead(27);
-  float voltage_battery = analogRead(12);
+  int level_oil = analogRead(PIN_LEVEL_OIL);
+  int temp_oil = analogRead(PIN_TEMP_OIL);
+  int temp_air = analogRead(PIN_TEMP_AIR);
+  int voltage_battery = analogRead(PIN_VOLTAGE_BATTERY);
+
+    // Serial.println("level_oil -> " + String(level_oil));
+    // Serial.println("temp_oil ->" + String(temp_oil));
+    //   Serial.println("temp_air ->" + String(temp_air));
+    //     Serial.println("voltage_battery ->" + String(voltage_battery));
 
   StaticJsonDocument<200> json;
 
-  json["level_oil"] = level_oil;
-  json["temp_oil"] = temp_oil;
-  json["temp_air"] = temp_air;
-  json["voltage_battery"] = voltage_battery;
+  json["level_oil"] = String(level_oil);
+  json["temp_oil"] = String(temp_oil);
+  json["temp_air"] = String(temp_air);
+  json["voltage_battery"] = String(voltage_battery);
   
   String output;
 
@@ -89,7 +101,26 @@ void initSPIFFS() {
   }
 }
 
+void analog_test(void){
+    uint8_t pin[8] = {36,37,38,39,32,33,34,35};
+    for(uint8_t i = 0 ; i < 8 ; i++ ){     
+      pinMode(pin[i],INPUT);
+      float val = analogRead(pin[i]);
+      if(val > 0){
+        Serial.println("PIN -> " + String(int(pin[i])) + " VALUE ->" + String(val));
+        
+      }
+      delay(1000);
+    }
+}
+
 void setup(){
+
+  pinMode(PIN_TEMP_OIL,INPUT);
+  pinMode(PIN_TEMP_AIR,INPUT);
+  pinMode(PIN_LEVEL_OIL,INPUT);
+  pinMode(PIN_VOLTAGE_BATTERY,INPUT);
+
   Serial.begin(115200);
   // WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(ssid, password);
@@ -100,7 +131,7 @@ void setup(){
   server.addHandler(&web_socket);
 
   initSPIFFS();
-  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html").setCacheControl("no-cache, no-store, must-revalidate");
   // server.serveStatic("/", SPIFFS, file);
 // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
 //     File file = SPIFFS.open("/index.html", "r");
@@ -115,15 +146,22 @@ void setup(){
 
 
   server.begin();
+
 }
 
 void loop(){
   // Read_Sensor();
   // delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
+  
+  if(flag){
+      analog_test();
+      flag = false;
+  }
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillis >= interval){
     previousMillis = currentMillis;
     Read_Sensor();
+    // analog_test();
   }
   web_socket.cleanupClients(); // نگهداری از WebSocket‌ها
 

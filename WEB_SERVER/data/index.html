@@ -140,38 +140,38 @@
         </div>
     </div>
     <!-- </div> -->
-    </body>
     <script>
 
         function updateUI(data) {
-    document.getElementById("level_oil").innerText = data.level_oil;
-    document.getElementById("temp_oil").innerText = data.temp_oil;
-    document.getElementById("temp_air").innerText = data.temp_air;
-    document.getElementById("voltage_battery").innerText = data.voltage_battery;
-}
+                document.getElementById("level_oil").innerText = data.level_oil;
+                document.getElementById("temp_oil").innerText = data.temp_oil;
+                document.getElementById("temp_air").innerText = data.temp_air;
+                document.getElementById("voltage_battery").innerText = data.voltage_battery; 
+        }
 
-const socket = new WebSocket("ws://localhost:8080");
+        const socket = new WebSocket("ws://192.168.4.1/ws");
 
-// وقتی اتصال باز شد
-socket.addEventListener("open", () => {
-    console.log("Connected to ESP32 WebSocket");
-});
+        // وقتی اتصال باز شد
+        socket.addEventListener("open", () => {
+            console.log("Connected to ESP32 WebSocket");
+        });
 
-// وقتی پیامی دریافت شد
-socket.addEventListener("message", (event) => {
-    console.log("Data received from ESP32:", event.data);
-    try {
-        const json = JSON.parse(event.data);
-        updateUI(json); // داده‌ها را به UI منتقل کن
-    } catch (e) {
-        console.error("Invalid JSON", e);
-    }
-});
+        // وقتی پیامی دریافت شد
+        socket.addEventListener("message", (event) => {
+            console.log("Data received from ESP32:", event.data);
+            try {
+                const json = JSON.parse(event.data);
+                updateUI(json); // داده‌ها را به UI منتقل کن
+            } catch (e) {
+                console.error("Invalid JSON", e);
+            }
+        });
 
-// وقتی اتصال بسته شد
-socket.addEventListener("close", () => {
-    console.log("WebSocket closed");
-});
+        // وقتی اتصال بسته شد
+        socket.addEventListener("close", () => {
+            console.log("WebSocket closed");
+        });
 
     </script>
+    </body>
 </html>

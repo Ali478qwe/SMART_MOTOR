@@ -235,7 +235,7 @@ h1{
 
 .management .noting{
     grid-area: noting;
-    background-color: rgb(38, 255, 0);
+    /* background-color: rgb(38, 255, 0); */
     border-radius: 100px;
     height: 400px;
     margin: 0px 0px 40px 30px;
@@ -297,7 +297,7 @@ h4{
     width: 100px;
 }
 .notif_item_box{
-    background-color: rgb(177, 7, 7);
+    /* background-color: rgb(177, 7, 7); */
      width:100%;
      margin-right: 100px;
 }
@@ -310,7 +310,7 @@ h4{
 }
 
 .data{
-    background-color: rgb(99, 99, 99);
+    /* background-color: rgb(99, 99, 99); */
     height: 20%;
      width:100%;
      margin: 0 0 15px 0;

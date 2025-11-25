@@ -1,6 +1,6 @@
 
 #include <HardwareSerial.h>
-#include <string.h>
+// #include <string.h>
 
 //UART PIN FOR SIM800 CONNECTION
 static const int8_t RX_PIN_tTX_SIM800 = 16, TX_PIN_tRX_SIM800 = 17;

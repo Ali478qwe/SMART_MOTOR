@@ -131,9 +131,9 @@
         </div>
         <div class="control flex_column center">
             <div class="flex center"><img  src="icon/moon_1.png" class="control_icon"></div>
-            <div id="test_message" class="flex center"><img  src="icon/message.png" class="control_icon"></div>
-            <div class="flex center"><img  src="icon/phone.png" class="control_icon"></div>
-            <div class="flex center"><img  src="icon/check_mark.png" class="control_icon"></div>
+            <div id="message_test" class="flex center"><img  src="icon/message.png" class="control_icon"></div>
+            <div id="call_test" class="flex center"><img  src="icon/phone.png" class="control_icon"></div>
+            <div id="reset_runtime" class="flex center"><img  src="icon/check_mark.png" class="control_icon"></div>
         </div>
         <div class="noting">
             <h1 id="cmd"></h1>
@@ -141,11 +141,9 @@
     </div>
     <!-- </div> -->
    
+    <script src="toggle.js"></script>
     <script>
 
-        function button(id,func){
-      document.getElementById(id).addEventListener("click",func);
-}
 
         
 
@@ -163,7 +161,9 @@
             console.log("Connected to ESP32 WebSocket");
         });
 
-        const test = button("test_message" , ()=>{socket.send("PING");});
+        const message_test = button("message_test" , ()=>{socket.send("message_test");});
+        const test_call = button("call_test" , ()=>{socket.send("call_test");}); 
+        const reset_runtime = button("reset_runtime" , ()=>{socket.send("reset_runtime");});
 
         // وقتی پیامی دریافت شد
         socket.addEventListener("message", (event) => {

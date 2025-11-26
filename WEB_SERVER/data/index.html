@@ -131,7 +131,7 @@
         </div>
         <div class="control flex_column center">
             <div class="flex center"><img  src="icon/moon_1.png" class="control_icon"></div>
-            <div class="flex center"><img  src="icon/message.png" class="control_icon"></div>
+            <div id="test_message" class="flex center"><img  src="icon/message.png" class="control_icon"></div>
             <div class="flex center"><img  src="icon/phone.png" class="control_icon"></div>
             <div class="flex center"><img  src="icon/check_mark.png" class="control_icon"></div>
         </div>
@@ -140,7 +140,14 @@
         </div>
     </div>
     <!-- </div> -->
+   
     <script>
+
+        function button(id,func){
+      document.getElementById(id).addEventListener("click",func);
+}
+
+        
 
         function updateUI(data) {
                 document.getElementById("level_oil").innerText = data.level_oil;
@@ -155,6 +162,8 @@
         socket.addEventListener("open", () => {
             console.log("Connected to ESP32 WebSocket");
         });
+
+        const test = button("test_message" , ()=>{socket.send("PING");});
 
         // وقتی پیامی دریافت شد
         socket.addEventListener("message", (event) => {

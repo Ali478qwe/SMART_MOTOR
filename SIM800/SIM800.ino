@@ -41,12 +41,12 @@ void SMS_PARSER(String massage, String &status, String &sender, String &dateTime
 
 void SEND_SMS(String number, String text) {
   UART_SIM800.println("AT+CMGS=\"" + number + "\"");
-  unsigned long start = millis();
+  // unsigned long start = millis();
 
-  while (!UART_SIM800.available() && millis() - start < 3000) { }
+  // while (!UART_SIM800.available() && millis() - start < 3000) { }
   delay(100);
   UART_SIM800.println(text);
-  delay(500);
+ 
   UART_SIM800.write(26); // CTRL+Z
 }
 
@@ -130,7 +130,7 @@ void setup() {
   UART_SIM800.begin(9600, SERIAL_8N1, RX_PIN_tTX_SIM800, TX_PIN_tRX_SIM800);
   Serial.println("UART SIM800 Started");
   delay(1000);
-  UART_SIM800.println("ATE0");
+  // UART_SIM800.println("ATE0");
   delay(500);
   // Serial.print("AT: ");
   UART_SIM800.println("AT");
@@ -194,8 +194,8 @@ void loop() {
         Serial.println(sender);
         Serial.println(dateTime);
         Serial.println(text);//BODY_CODE(RESPONSE_CMGR)
-        if(sender == "+989024381736")
-        {
+        // if(sender == "+989024381736")
+        // {
             //verification text : location:1234
             String verify = Verification(text,"location","Ali478qwe");
               Serial.println(verify);
@@ -204,7 +204,7 @@ void loop() {
               SEND_SMS(sender,"MASSAGE RECIVED");
             }
         }
-      }
+      //}
       
 
     }

@@ -236,12 +236,12 @@ void loop()
 
                       //LOCATION LINKS
                     
-                      String location_links = String("https://google.com/maps?p=" + String(gps.location.lat(),6) + "," +  String(gps.location.lng(),6)) + "\n" +           
-                                              String("https://neshan.org/maps?lat=" + String(gps.location.lat(),6) + "&lng=" + String(gps.location.lng(),6)) + "\n" +     
-                                              String("https://balad.ir/location/" + String(gps.location.lat(),6) + "," +  String(gps.location.lng(),6));
+                      String location_links = String("https://google.com/maps?q=" + String(gps.location.lat(),6) + "," +  String(gps.location.lng(),6)) + "\n\n" +           
+                                              String("https://neshan.org/maps?lat=" + String(gps.location.lat(),6) + "&lng=" + String(gps.location.lng(),6)) + "\n\n" +     
+                                              String("https://balad.ir/location?latitude=" + String(gps.location.lat(),6) + "&longitude=" +  String(gps.location.lng(),6));
                       Serial.println(location_links);
                       Serial.println("_________________");
-                      SEND_SMS(sender,"location_links");
+                      SEND_SMS(sender,location_links);
                   }
                 }
               

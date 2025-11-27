@@ -27,18 +27,20 @@ IPAddress local_IP(192, 168, 4, 1);
 IPAddress gateway(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
+String wsMessage = "";
+
 //create a customer class from websocket header
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-    data[len] = 0;
-    String msg = (char*)data;
-    Serial.printf("Received WS message: %s\n", msg.c_str());
-
-    if (msg == "PING") {
-      web_socket.textAll("PONG");
+    
+    String msg = "";
+    for(size_t i = 0 ; i < len ; i++)
+    {
+        msg += (char)data[i];
     }
+    wsMessage = msg ; 
   }
 }
 
@@ -163,6 +165,20 @@ void loop(){
     Read_Sensor();
     // analog_test();
   }
+
+  if(wsMessage == "message_test")
+  {
+
+  }
+  else if(wsMessage == "call_test")
+  {
+
+  }
+  else if(wsMessage == "reset_runtime")
+  {
+
+  }
+
   web_socket.cleanupClients(); // نگهداری از WebSocket‌ها
 
 }

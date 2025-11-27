@@ -17,10 +17,10 @@ static const uint8_t RX_PIN_tTX_SIM800 = 16 , TX_PIN_tRX_SIM800 = 17;
 TinyGPSPlus gps; 
 
 //DEFINE UART NAME PORT FOR GSM
-HardwareSerial UART_SIM800 (1);
+HardwareSerial UART_SIM800 (2);
 
 //DEFINE UART NAME PORT FOR GPS
-HardwareSerial UART_GPS (2);
+HardwareSerial UART_GPS (1);
 
 
 String status, sender, dateTime , text;
@@ -112,6 +112,38 @@ String Verification(String text , String Key_Word , String Password){
   
 }
 
+void SIM800_init(void){
+  UART_SIM800.println("ATE0");
+  delay(500);
+  // Serial.print("AT: ");
+  UART_SIM800.println("AT");
+  delay(500);
+  // Serial.print("ATI: ");
+  UART_SIM800.println("ATI");
+  delay(500);
+  // Serial.print("AT+CSQ: ");
+  UART_SIM800.println("AT+CSQ");
+  delay(500);
+  // Serial.print("AT+CCID: ");
+  UART_SIM800.println("AT+CCID");
+  delay(500);
+  UART_SIM800.println("AT+CPIN?");
+  delay(500);
+  // Serial.print("AT+CREG: ");
+  UART_SIM800.println("AT+CREG?");
+  delay(500);
+  // Serial.print("AT+CBC: ");
+  UART_SIM800.println("AT+CBC");
+  delay(500);
+  // Serial.print("AT+CMGF: ");
+  UART_SIM800.println("AT+CMGF=1");
+  delay(500);
+  UART_SIM800.println("AT+CFUN?");
+  delay(500);
+  UART_SIM800.println("AT+CSCLK?");
+  delay(500);
+}
+
 void setup() 
 {
 
@@ -128,6 +160,8 @@ void setup()
   //TIP : Baud rate = 9600
   UART_SIM800.begin(9600,SERIAL_8N1,RX_PIN_tTX_SIM800,TX_PIN_tRX_SIM800);
   Serial.println("UART SIM800 Started");
+  delay(1000);
+  SIM800_init();
 
  
 
@@ -136,6 +170,11 @@ void setup()
 
 void loop() 
 {
+    if (Serial.available()) {
+    UART_SIM800.println(Serial.readStringUntil('\n'));
+   
+  }
+
    if (UART_SIM800.available())
   {
     String response = UART_SIM800.readString();
@@ -160,63 +199,51 @@ void loop()
         Serial.println(sender);
         Serial.println(dateTime);
         Serial.println(text);//BODY_CODE(RESPONSE_CMGR)
-        if(sender == "+989024381736")
-        {
+        // if(sender == "+989024381736")
+        // {
             //verification text : location:1234
             String verify = Verification(text,"location","Ali478qwe");
               Serial.println(verify);
             if(verify == "VERIFIED")
             {
-                if(UART_GPS.available())
+               
+                while (UART_GPS.available()) {
+                      gps.encode(UART_GPS.read());
+                }
+
+                if(gps.satellites.isValid())
                 { 
+                  Serial.println("Satellite Found");
+                  //GPS VALUE
+                  Serial.println(String("Satellite Value: " + String(gps.satellites.value()) ));
+                }
+                else
+                {
+                  Serial.println("Satellite Not Found");
+                }//IS_VALID
 
-                  // char c = UART_GPS.read();
-                  // Serial.write(c);
+                if(gps.location.isValid()){
+                  Serial.println("Location Found");
 
-                  //ENCODE UART DATA FROM GPS
-                  gps.encode(UART_GPS.read());
-                  
-                  if(Serial.available())
+                  if(gps.location.isUpdated())
                   {
+                      //PRINT DAtA
+                      Serial.println("GEOGRAPHICAL LOCATION");
+                      Serial.println("Geo width:");
+                      Serial.println(gps.location.lat(),6);
+                      Serial.println("Geo Length:");
+                      Serial.println(gps.location.lng(),6);
 
+                      //LOCATION LINKS
                     
-                    if(Serial.read() == '1')
-                    {
-                      
-                      Serial.println("Serial Command Recived");
-
-                      if(gps.location.isValid())
-                      { 
-                        Serial.println("Satellite Found");
-                        //GPS VALUE
-                        Serial.println(String("Satellite Value: " + String(gps.satellites.value()) ));
-
-                        if(gps.location.isUpdated())
-                        {
-                            //PRINT DAtA
-                            Serial.println("GEOGRAPHICAL LOCATION");
-                            Serial.println("Geo width:");
-                            Serial.println(gps.location.lat(),6);
-                            Serial.println("Geo Length:");
-                            Serial.println(gps.location.lng(),6);
-
-                            //LOCATION LINKS
-                           
-                            String location_links = String("https://google.com/maps?p=" + String(gps.location.lat(),6) + "," +  String(gps.location.lng(),6)) + "\n" +           
-                                                    String("https://neshan.org/maps?lat=" + String(gps.location.lat(),6) + "&lng=" + String(gps.location.lng(),6)) + "\n" +     
-                                                    String("https://balad.ir/location/" + String(gps.location.lat(),6) + "," +  String(gps.location.lng(),6));
-                            Serial.println(location_links);
-                            Serial.println("_________________");
-                            SEND_SMS(sender,location_links);
-                        }
-                      }
-                      else
-                      {
-                        Serial.println("Satellite Not Found");
-                      }//IS_VALID
-                    }
+                      String location_links = String("https://google.com/maps?p=" + String(gps.location.lat(),6) + "," +  String(gps.location.lng(),6)) + "\n" +           
+                                              String("https://neshan.org/maps?lat=" + String(gps.location.lat(),6) + "&lng=" + String(gps.location.lng(),6)) + "\n" +     
+                                              String("https://balad.ir/location/" + String(gps.location.lat(),6) + "," +  String(gps.location.lng(),6));
+                      Serial.println(location_links);
+                      Serial.println("_________________");
+                      SEND_SMS(sender,"location_links");
                   }
-                }//GPS AVAILABLE
+                }
               
             }
         }
@@ -225,6 +252,6 @@ void loop()
 
     }
     // Serial.write(UART_SIM800.read());
-  }
+  
  
 }//loop

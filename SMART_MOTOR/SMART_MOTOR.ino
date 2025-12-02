@@ -2,10 +2,26 @@
 #include <TinyGPSPlus.h>
 #include <HardwareSerial.h>
 #include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <FS.h>
+#include <SPIFFS.h>
+#include <ArduinoJson.h>
+// #include <esp_task_wtd.h>
 
+
+unsigned long previousMillis = 0;
+const long interval = 1000;
 
 const char* ssid = "َc++";
 const char* password = "12345678";
+
+const char * file = "/index.html";
+
+uint8_t PIN_TEMP_OIL = 32;
+uint8_t PIN_TEMP_AIR = 33;
+uint8_t PIN_LEVEL_OIL = 34;
+uint8_t PIN_VOLTAGE_BATTERY = 35;
 
 //UART PIN FOR GPS CONNECTION
 static const uint8_t RX_PIN_tTX_GPS = 4 , TX_PIN_tRX_GPS = 5;
@@ -16,12 +32,21 @@ static const uint8_t RX_PIN_tTX_SIM800 = 16 , TX_PIN_tRX_SIM800 = 17;
 //GPS CLASS FOR DATA ANALYSIS
 TinyGPSPlus gps; 
 
+AsyncWebServer server(80);
+AsyncWebSocket web_socket("/ws");
+
+IPAddress local_IP(192, 168, 4, 1);
+IPAddress gateway(192, 168, 4, 1);
+IPAddress subnet(255, 255, 255, 0);
+
 //DEFINE UART NAME PORT FOR GSM
 HardwareSerial UART_SIM800 (2);
 
 //DEFINE UART NAME PORT FOR GPS
 HardwareSerial UART_GPS (1);
 
+String wsMessage = "";
+bool wsNewMessage = false;   
 
 String status, sender, dateTime , text;
 
@@ -144,18 +169,108 @@ void SIM800_init(void){
   delay(500);
 }
 
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    
+    String msg = "";
+    for(size_t i = 0 ; i < len ; i++)
+    {
+        msg += (char)data[i];
+    }
+    wsMessage = msg ; 
+    wsNewMessage = true;   
+
+  }
+}
+
+void web_socket_handler(AsyncWebSocket * server, AsyncWebSocketClient * client,
+             AwsEventType type, void *arg, uint8_t *data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+      handleWebSocketMessage(arg, data, len);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
+  }
+}
+
+void Read_Sensor(void){
+  int level_oil = analogRead(PIN_LEVEL_OIL);
+  int temp_oil = analogRead(PIN_TEMP_OIL);
+  int temp_air = analogRead(PIN_TEMP_AIR);
+  int voltage_battery = analogRead(PIN_VOLTAGE_BATTERY);
+
+    // Serial.println("level_oil -> " + String(level_oil));
+    // Serial.println("temp_oil ->" + String(temp_oil));
+    //   Serial.println("temp_air ->" + String(temp_air));
+    //     Serial.println("voltage_battery ->" + String(voltage_battery));
+
+  StaticJsonDocument<200> json;
+
+  json["level_oil"] = String(level_oil);
+  json["temp_oil"] = String(temp_oil);
+  json["temp_air"] = String(temp_air);
+  json["voltage_battery"] = String(voltage_battery);
+  
+  String output;
+
+  serializeJson(json , output);
+
+  web_socket.textAll(output);
+
+}
+
+void initSPIFFS() {
+  if (!SPIFFS.begin(false)) {
+    Serial.println("An error has occurred while mounting SPIFFS");
+    return;
+  }
+  Serial.println("SPIFFS mounted successfully");
+  if (SPIFFS.exists(file)) {
+    Serial.println("file exists");
+  } else {
+    Serial.println("file not found");
+  }
+}
+
 void setup() 
 {
+  // esp_task_wtd_deinit();
+  pinMode(PIN_TEMP_OIL,INPUT);
+  pinMode(PIN_TEMP_AIR,INPUT);
+  pinMode(PIN_LEVEL_OIL,INPUT);
+  pinMode(PIN_VOLTAGE_BATTERY,INPUT);
+
 
  //ACTIVATE SERIAL MONITRO
  Serial.begin(115200);
 
- //ACTIVATE GPS UART
- //TIP : Baud rate = 9600
+
  
   WiFi.softAP(ssid, password);
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
+
+  web_socket.onEvent(web_socket_handler);
+  server.addHandler(&web_socket);
+
+  initSPIFFS();
+
+  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html").setCacheControl("no-cache, no-store, must-revalidate");
+
+ //ACTIVATE GPS UART
+ //TIP : Baud rate = 9600
   UART_GPS.begin(9600,SERIAL_8N1,RX_PIN_tTX_GPS,TX_PIN_tRX_GPS);
   Serial.println("UART GPS Started");
+
   //ACTIVATE GPS UART
   //TIP : Baud rate = 9600
   UART_SIM800.begin(9600,SERIAL_8N1,RX_PIN_tTX_SIM800,TX_PIN_tRX_SIM800);
@@ -163,13 +278,40 @@ void setup()
   delay(1000);
   SIM800_init();
 
- 
+  server.begin();
 
 
 }
 
 void loop() 
 {
+
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillis >= interval){
+    previousMillis = currentMillis;
+    Read_Sensor();
+  }
+
+  if(wsNewMessage) {
+
+    wsNewMessage = false;  
+    
+    if(wsMessage == "message_test") {
+      Serial.println("Message Test Triggered");
+      wsMessage = "";
+      SEND_SMS("+989922176798","TEST MESSAGE");
+     
+    }
+    else if(wsMessage == "call_test") {
+      Serial.println("Call Test Triggered");
+      wsMessage = "";
+    }
+    else if(wsMessage == "reset_runtime") {
+      Serial.println("Reset Runtime Triggered");
+      wsMessage = "";
+    }
+  }
+
     if (Serial.available()) {
     UART_SIM800.println(Serial.readStringUntil('\n'));
    
@@ -204,7 +346,7 @@ void loop()
             //verification text : location:1234
             String verify = Verification(text,"location","Ali478qwe");
               Serial.println(verify);
-            if(verify == "VERIFIED")
+            if(verify == "VERIFIED" )
             {
                
                 while (UART_GPS.available()) {
@@ -253,5 +395,6 @@ void loop()
     }
     // Serial.write(UART_SIM800.read());
   
+   web_socket.cleanupClients();
  
 }//loop

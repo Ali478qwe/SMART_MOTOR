@@ -28,6 +28,8 @@ IPAddress gateway(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
 String wsMessage = "";
+bool wsNewMessage = false;
+
 
 //create a customer class from websocket header
 
@@ -41,6 +43,8 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         msg += (char)data[i];
     }
     wsMessage = msg ; 
+    wsNewMessage = true;   
+
   }
 }
 
@@ -153,32 +157,39 @@ void setup(){
 
 void loop(){
   // Read_Sensor();
-  // delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
+  // // delay(200); // هر 200 میلی‌ثانیه یکبار ارسال می‌شود (قابل تنظیم)
   
-  if(flag){
-      analog_test();
-      flag = false;
-  }
-  unsigned long currentMillis = millis();
-  if(currentMillis - previousMillis >= interval){
-    previousMillis = currentMillis;
-    Read_Sensor();
-    // analog_test();
+  // if(flag){
+  //     analog_test();
+  //     flag = false;
+  // }
+  // unsigned long currentMillis = millis();
+  // if(currentMillis - previousMillis >= interval){
+  //   previousMillis = currentMillis;
+  //   Read_Sensor();
+  //   // analog_test();
+  // }
+
+
+  if(wsNewMessage) {
+
+    wsNewMessage = false;  // پرچم ریست شود
+    
+    if(wsMessage == "message_test") {
+      Serial.println("Message Test Triggered");
+      wsMessage = "";
+      // عملیات سنگین نکن!
+    }
+    else if(wsMessage == "call_test") {
+      Serial.println("Call Test Triggered");
+      wsMessage = "";
+    }
+    else if(wsMessage == "reset_runtime") {
+      Serial.println("Reset Runtime Triggered");
+      wsMessage = "";
+    }
   }
 
-  if(wsMessage == "message_test")
-  {
-
-  }
-  else if(wsMessage == "call_test")
-  {
-
-  }
-  else if(wsMessage == "reset_runtime")
-  {
-
-  }
-
-  web_socket.cleanupClients(); // نگهداری از WebSocket‌ها
+  web_socket.cleanupClients(); 
 
 }

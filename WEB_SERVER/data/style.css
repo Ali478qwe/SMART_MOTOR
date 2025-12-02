@@ -206,14 +206,14 @@ h1{
    margin: 0;
 }
 
-.control div{
+.control button{
     background-color: rgb(255, 255, 255,0.5);
     height: 145px;
     width: 145px;
     border-radius: 50px;
 }
 
-.control div:hover{
+.control button:hover{
     background-color:  rgb(255, 255, 255);
     transform: scale(1.0225);
     border: 2px solid rgba(0, 0, 0, 0.4);

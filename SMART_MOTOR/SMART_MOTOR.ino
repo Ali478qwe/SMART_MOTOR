@@ -299,7 +299,7 @@ void loop()
     if(wsMessage == "message_test") {
       Serial.println("Message Test Triggered");
       wsMessage = "";
-      SEND_SMS("+989922176798","TEST MESSAGE");
+      SEND_SMS("+989*********","TEST MESSAGE");
      
     }
     else if(wsMessage == "call_test") {
@@ -341,7 +341,7 @@ void loop()
         Serial.println(sender);
         Serial.println(dateTime);
         Serial.println(text);//BODY_CODE(RESPONSE_CMGR)
-        // if(sender == "+989024381736")
+        // if(sender == "+989********")
         // {
             //verification text : location:1234
             String verify = Verification(text,"location","Ali478qwe");

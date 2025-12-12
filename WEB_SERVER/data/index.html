@@ -58,126 +58,146 @@
         <div class="notification flex_column center">
             <div class="data flex_row center">
                 <img class="icon" src="icon/list.png">
-                <h1>DATA</h1>
-
+                <h1 style="font-family: APEX;">STATUS</h1>
             </div>
             <div class="notif_item_box flex center gap_10">
-                <div class="flex_column gap">
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color: orange;"></div>
+                <div class="flex_column gap ">
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color: orange;"></div>
                         <h4>message</h4>
                     </div>
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color: red;"></div>
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color: red;"></div>
                         <h4>sim ok</h4>
                     </div>
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color: yellowgreen"></div>
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color: yellowgreen"></div>
                         <h4>message</h4>
                         </div>    
                 </div>
-                <div class="flex_column gap">
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color:darkmagenta;"></div>
+                <div class="flex_column gap margin_item">
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color:darkmagenta;"></div>
                         <h4>charge</h4>
                     </div>
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color:lightseagreen;"></div>
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color:lightseagreen;"></div>
                         <h4>call notif</h4>
                     </div>
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color:lightcoral;"></div>
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color:lightcoral;"></div>
                         <h4>password</h4>
                     </div>    
                 </div>
                 <div class="flex_column gap">
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color:brown;"></div>
+                    <div class="notif_box flex_row align gap_10 ">
+                        <div class="dot_margin dot" style="background-color:brown;"></div>
                         <h4>message</h4>
                     </div>
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color:cornflowerblue;"></div>
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color:cornflowerblue;"></div>
                         <h4>sim ok</h4>
                     </div>
-                    <div class="notif_box flex_row center gap_10">
-                        <div class="dot" style="background-color: gold;"></div>
+                    <div class="notif_box flex_row align gap_10">
+                        <div class="dot_margin dot" style="background-color: gold;"></div>
                         <h4>message</h4>
                     </div>    
                 </div>
         </div>
     </div>
-        <div class="runtime flex_column center">
-           
+   
+        <div class="runtime zero_margin flex_column center">
         <div class="flex_row heigth">
          <img class="control_icon" src="icon/time.png">
         <h2>Run Time</h2>
         
         </div>
         <div class="count_bar flex_row center">
-           <h1>23</h1>
+           <h1 id="runtime_value">23</h1>
            <h3>.min</h3>
         </div>
         </div>
-        <div class="battery zero_margin flex_column center">
+        <div class="battery flex_column center">
         <div class="flex_row heigth">
         <img src="icon/battery.png" class="control_icon">
         <h2>Battrey</h2>
         
         </div>
         <div class="count_bar flex_row center">
-           <h1 id="voltage_battery">50</h1>
+           <h1 id="voltage_battery_value">50</h1>
            <h3>.volt</h3>
         </div>
         </div>
+        
         <div class="control flex_column center">
-            <button  class="flex center"><img  src="icon/moon_1.png" class="control_icon"></button>
-            <button type="button"  id="message_test" class="flex center"><img  src="icon/message.png" class="control_icon"></button>
-            <button id="call_test" class="flex center"><img  src="icon/phone.png" class="control_icon"></button>
-            <button id="reset_runtime" class="flex center"><img  src="icon/check_mark.png" class="control_icon"></button>
+            <button type="button"  class="mode flex center"><img class="img_mode control_icon"  src="icon/moon.png" ></button>
+            <button type="button"  id="message_test" class="flex center"><img  class="control_icon" src="icon/message.png"></button>
+            <button type="button"  id="call_test" class="flex center"><img class="control_icon" src="icon/phone.png"></button>
+            <button type="button"  id="reset_runtime" class="flex center"><img class="control_icon" src="icon/check_mark.png"></button>
+       
         </div>
         <div class="noting">
-            <h1 id="cmd"></h1>
-        </div>
+           
+     </div>
     </div>
     <!-- </div> -->
    
     <script src="toggle.js"></script>
     <script>
 
+        const button_mode = document.querySelector(".mode");
+        const img_mode = document.querySelector(".img_mode");
+
+        function theme() {
+            // document.body.style.backgroundColor = this.isOn ? "#F8FAFC" :"#222831" ;
+            document.documentElement.classList.remove("light", "dark");
+            document.documentElement.classList.add(this.isOn ? "light" :"dark");
+            img_mode.src = this.isOn ?  "icon/moon.png":"icon/sun.png" ;
+            localStorage.setItem("dark_mode",this.isOn ? "true" : "false");
+       
+        }
+
+       
+
+       const mode = new toggle(true, theme, button_mode);
+       mode.click();
+       const last_mode  = localStorage.getItem("dark_mode") === "true";
+       mode.reload(last_mode);
         
 
         function updateUI(data) {
                 document.getElementById("level_oil").innerText = data.level_oil;
                 document.getElementById("temp_oil").innerText = data.temp_oil;
                 document.getElementById("temp_air").innerText = data.temp_air;
-                document.getElementById("voltage_battery").innerText = data.voltage_battery; 
+                document.getElementById("voltage_battery").innerText = data.voltage_battery;
+                document.getElementById("runtime_value").innerHTML = dtat.runtime; 
         }
 
         const socket = new WebSocket("ws://192.168.4.1/ws");
 
-        // وقتی اتصال باز شد
+        
         socket.addEventListener("open", () => {
             console.log("Connected to ESP32 WebSocket");
         });
 
-        // const message_test = button("message_test" , ()=>{socket.send("message_test");});
+        const message_test = button("message_test" , ()=>{socket.send("message_test");});
         const test_call = button("call_test" , ()=>{socket.send("call_test");}); 
         const reset_runtime = button("reset_runtime" , ()=>{socket.send("reset_runtime");});
  
          document.getElementById("message_test").addEventListener("click", ()=>{socket.send("message_test");});
 
-        // وقتی پیامی دریافت شد
+    
         socket.addEventListener("message", (event) => {
             console.log("Data received from ESP32:", event.data);
             try {
                 const json = JSON.parse(event.data);
-                updateUI(json); // داده‌ها را به UI منتقل کن
+                updateUI(json);
             } catch (e) {
                 console.error("Invalid JSON", e);
             }
         });
 
-        // وقتی اتصال بسته شد
+
         socket.addEventListener("close", () => {
             console.log("WebSocket closed");
         });

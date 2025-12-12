@@ -1,3 +1,92 @@
+:root{
+    --bg-color : #222831;
+    --shadow-head : rgba(0, 0, 0, 0.1);
+    --bg-color-item-box : #FFF2C6;
+    --bg-color-item : #FFF8DE;
+    --border-color-item : rgba(0, 0, 0, 0.3); 
+    --text-color-title-item-bar : #222831;
+    --text-color-counts-items : rgba(0, 0, 0, 0.747);
+    --text-color-units-item-bar : #222831 ;/*blue*/
+    --bg-color-status : #E6E6E6;
+    --bg-color-db : white ;
+    --text-color-db : orange ;
+    --button-color-control : #E6E6E6;
+    --button-color-control-hover : white;
+    --button-border-color-control :rgba(0, 0, 0, 0.4) ;
+    --bg-color-control-bar : #ffffff46;
+    --text-color-header : #fff8de;
+    --border-color-icon-header : #fff8de;
+    --bg-color-dot : chartreuse;
+    --text-color-notification : rgb(0, 0, 0);
+    --bg-color-notif-box :white;
+}
+
+:root.light {
+  --bg-color: #fafbfc;                 
+  --shadow-head: rgba(0, 0, 0, 0.05);
+
+  --bg-color-item-box: #fff9e6;       
+  --bg-color-item: #fffdf6;
+
+  --border-color-item: rgba(0, 0, 0, 0.1);
+
+  --text-color-title-item-bar: #333;   
+  --text-color-counts-items: #666;
+  --text-color-units-item-bar: #444;
+
+  --bg-color-status: #efefef;
+  --bg-color-db: #ffffff;
+  --text-color-db: #c79f58;            
+
+  --button-color-control: #eaeaea;
+  --button-color-control-hover: #f3f3f3;
+  --button-border-color-control: rgba(0, 0, 0, 0.15);
+
+  --bg-color-control-bar: #00000008;
+
+  --text-color-header: #3d3d3d;
+  --border-color-icon-header: #3d3d3d;
+
+  --bg-color-dot: #7fcf5d;             
+  --text-color-notification: #2d2d2d;
+  --bg-color-notif-box: #ffffff;
+}
+
+
+
+:root.dark {
+  --bg-color: #2f3136;               
+  --shadow-head: rgba(0, 0, 0, 0.12);
+  --bg-color-item-box: #3a3c42;       
+  --bg-color-item: #43454b;
+  --border-color-item: rgba(255, 255, 255, 0.08);
+
+  --text-color-title-item-bar: #e6e6e6;   
+  --text-color-counts-items: #b8b8b8;
+  --text-color-units-item-bar: #dcdcdc;
+
+  --bg-color-status: #3a3a3a;
+  --bg-color-db: #36393f;
+  --text-color-db: #d8b98a;            
+
+  --button-color-control: #3a3c42;
+  --button-color-control-hover: #4a4c52;
+  --button-border-color-control: rgba(255, 255, 255, 0.12);
+
+  --bg-color-control-bar: #ffffff10;
+
+  --text-color-header: #e8e8e8;
+  --border-color-icon-header: #e8e8e8;
+
+  --bg-color-dot: #8ccf6b;            
+  --text-color-notification: #e6e6e6;
+  --bg-color-notif-box: #3d3f45;
+}
+
+
+
+
+
 @font-face {
     font-family: APEX;
     src: url(fonts/Apex\ Mk3\ Black.ttf);
@@ -32,6 +121,15 @@
     flex-direction: column;
 }
 
+.align{
+    
+    align-items: center ;
+}
+
+.dot_margin{
+    margin:  0 0 0 10px ;
+}
+
 .gap{
     gap: 20px;
 }
@@ -53,6 +151,10 @@
     justify-content: center;
 }
 
+.margin_item{
+    margin: 0px px 0 18.3px;
+}
+
 
 
 
@@ -60,8 +162,7 @@
 body{
     width: 100%;
     height: 100%;
-    background-color: #F8FAFC;/*rgb(0, 183, 255) */
-    background-color: #222831;
+    background-color: var(--bg-color);
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -82,20 +183,11 @@ body{
     height: 300px;
     width: 900px;
     border-radius: 50px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px var(--shadow-head);
 }
 
-/* .header img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    
-} */
-
 .item_box{   
-    background-color: #FFF2C6;
-    /* backdrop-filter: blur(5px); */
+    background-color: var(--bg-color-item-box);
     margin: 10px auto;
     gap: 0px 20px;
     height: 300px;
@@ -104,14 +196,13 @@ body{
 }
 
 .item{ 
-    background-color: #FFF8DE;/*rgba(243, 243, 243, 0.705)*/
-    color: rgba(255, 0, 0, 0.918);
+    background-color: var(--bg-color-item);/*rgba(243, 243, 243, 0.705)*/
     font-family: GOOGLE;
     height: 250px;
     width: 270px;
     border-radius: 50px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 0px 10px var(--shadow-head);
+    border: 1px solid var(--border-color-item);
     /* border: 4px solid rgb(114, 114, 114);*/
 } 
 
@@ -124,7 +215,7 @@ body{
 
 .item_title_bar h2{
   font-size: 35px;
-  color: #222831;
+  color: var(--text-color-title-item-bar);
   font-family: APEX;
   font-weight: bold;
 }
@@ -138,7 +229,7 @@ body{
 .count_bar h3{
     font-size: xx-large;
     position: relative;
-    color: #222831;
+    color: var(--text-color-units-item-bar);
     top:20px;
     font-family: FRIZON;
 }
@@ -153,7 +244,7 @@ body{
 h1{
     margin: 0;
     font-size: 100px;
-    color: rgba(0, 0, 0, 0.747);
+    color: var(--text-color-counts-items);
 }
 
 .management{
@@ -174,49 +265,48 @@ h1{
 
 .management .notification{  
    grid-area: notification;
-   background-color: #ffeaeae7;
+   background-color: var(--bg-color-status);
    border-radius: 50px;/*75px*/
-   margin: 0 15px 0px 20px;
+   margin: 0 0px 15px 0px;
    height: 320px;
-   width: 640px;
+   width: 700px;
 }
 
 .management .runtime{  
    grid-area: runtime;
-   background-color: #ffffff;
+   background-color: var(--bg-color-db);
    border-radius: 75px;
-   margin: 0 10px 0px 20px;
+   
    height: 310px;
-   width: 310px;
-   color: orange;
+   width: 335px;
+   color: var(--text-color-db);
    font-size: xx-large;
    font-family: GOOGLE;
 }
 
 .management .battery{
    grid-area: battery;
-   background-color: #ffffff;
+   background-color: var(--bg-color-db);
    border-radius: 75px;
-   margin: 0 0px 0 10px;
    height: 310px;
-   width: 310px;
-   color: orange;
+   width: 335px;
+   color: var(--text-color-db);
    font-size: xx-large;
    font-family: GOOGLE;
-   margin: 0;
+   margin: 0 0px 0 15px;
 }
 
 .control button{
-    background-color: rgb(255, 255, 255,0.5);
+    background-color: var(--button-color-control);
     height: 145px;
     width: 145px;
     border-radius: 50px;
 }
 
 .control button:hover{
-    background-color:  rgb(255, 255, 255);
+    background-color:  var(--button-color-control-hover);
     transform: scale(1.0225);
-    border: 2px solid rgba(0, 0, 0, 0.4);
+    border: 2px solid var(--button-border-color-control);
 }
 
 .control_icon{
@@ -227,10 +317,11 @@ h1{
 .management .control{
    grid-area: control;
    gap: 10px;
-   background-color: #9ed40b34;
+   background-color: var(--bg-color-control-bar);
    border-radius: 40px;
    height: 640px;
-   width: 200px;
+   width: 170px;
+   margin: 0 0 0 30px;
 }
 
 .management .noting{
@@ -252,7 +343,7 @@ h1{
     margin: 0;
     font-family: FRIZON;
     font-size: 40px;
-    color: #fff8de;
+    color: var(--text-color-header);
 }
 
 .profile{
@@ -260,7 +351,7 @@ h1{
     height: 100px;
     /* background-color: #fe0000; */
     background-image: url(icon/user.png);
-    border: 2px solid white;
+    border: 2px solid var(--border-color-icon-header);
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 90px;
@@ -276,7 +367,7 @@ h1{
     width: 100px;
     height: 100px;
     background-image: url(icon/setting.png);
-    border: 2px solid white;
+    border: 2px solid var(--border-color-icon-header);
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 90px;
@@ -284,28 +375,28 @@ h1{
 }
 
 .dot{
-    background-color: chartreuse;
+    background-color: var(--bg-color-dot);
     height: 30px;
     width: 30px;
     border-radius: 12px;
 }
 
 h4{
-    color: rgb(0, 0, 0);
-    font-size: large;
-    font-family: GRAND;
+    color: var(--text-color-notification);
+    font-size: 30px;
+    font-family:APEX;
     width: 100px;
 }
 .notif_item_box{
     /* background-color: rgb(177, 7, 7); */
      width:100%;
-     margin-right: 100px;
+     /* margin-right: 100px; */
 }
 .notif_box{
-    height: 50px;
-    width: 120%;
-    background-color: white;
-    border-radius: 15px;
+    height: 60px;
+    width: 210px;
+    background-color: var(--bg-color-notif-box);
+    border-radius: 20px;
 
 }
 
@@ -319,11 +410,4 @@ h4{
     h1{
         font-size: 50px;
     }
-}
-
-.i{
-    color: #ffffff;
-    height: 10px;
-    width: 100px;
-    border-radius: 10px solid rgb(255, 8, 8);
 }

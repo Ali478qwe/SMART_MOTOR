@@ -8,18 +8,21 @@
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
-// #include <esp_task_wtd.h>
+
 
 
 uint32_t last_time = 0;
 uint32_t last_runtime = 0;
 uint32_t last_send_data = 0;
 
+//Access Point Variable
 const char *ssid = "َc++";
 const char *password = "12345678";
 
+//main file set on web server
 const char *file = "/index.html";
 
+//Sensor Pin
 uint8_t PIN_TEMP_OIL = 32;
 uint8_t PIN_TEMP_AIR = 33;
 uint8_t PIN_LEVEL_OIL = 34;
@@ -31,15 +34,17 @@ static const uint8_t RX_PIN_tTX_GPS = 4, TX_PIN_tRX_GPS = 5;
 //UART PIN FOR SIM800 CONNECTION
 static const uint8_t RX_PIN_tTX_SIM800 = 16, TX_PIN_tRX_SIM800 = 17;
 
+//EEPROM Class instance
 Preferences _flash;
 
 //GPS CLASS FOR DATA ANALYSIS
 TinyGPSPlus gps;
 
 
-AsyncWebServer server(80);
-AsyncWebSocket web_socket("/ws");
+AsyncWebServer server(80);         //Create Web-Server on Port 80
+AsyncWebSocket web_socket("/ws");  //Create Web-Socket
 
+//IP Config
 IPAddress local_IP(192, 168, 4, 1);
 IPAddress gateway(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
@@ -50,11 +55,14 @@ HardwareSerial UART_SIM800(2);
 //DEFINE UART NAME PORT FOR GPS
 HardwareSerial UART_GPS(1);
 
+//Global Variable For Analysis Recived Message From WebSocket
 String wsMessage = "";
 bool wsNewMessage = false;
 
+//For Parsing SMS Message Structure
 String status, sender, dateTime, text;
 
+//This  Found Number Of SMS Function
 String SMS_NUM(String text) {
   int token = text.indexOf(",");
   if (token != -1) {
@@ -62,6 +70,7 @@ String SMS_NUM(String text) {
   }
 }
 
+//This is SMS parser function.
 void SMS_PARSER(String massage, String &status, String &sender, String &dateTime, String &text) {
   int firstQuote = massage.indexOf('"');
   int secondQuote = massage.indexOf('"', firstQuote + 1);
@@ -78,6 +87,7 @@ void SMS_PARSER(String massage, String &status, String &sender, String &dateTime
   text = massage.substring(sixthQuote + 1);
 }
 
+//Use This function For Sent Messaage for Any Phone Number
 void SEND_SMS(String number, String text) {
   UART_SIM800.println("AT+CMGS=\"" + number + "\"");
   unsigned long start = millis();
@@ -89,6 +99,7 @@ void SEND_SMS(String number, String text) {
   UART_SIM800.write(26);  // CTRL+Z
 }
 
+// Clean Uart data from noise and unreadable characters
 String cleanResponse(String raw) {
   String result = "";
   for (int i = 0; i < raw.length(); i++) {
@@ -100,6 +111,7 @@ String cleanResponse(String raw) {
   return result;
 }
 
+//َA function to verify authentication
 String Verification(String text, String Key_Word, String Password) {
 
   text.trim();
@@ -132,6 +144,7 @@ String Verification(String text, String Key_Word, String Password) {
   return "FORMAT_ERR";
 }
 
+//setup sim800
 void SIM800_init(void) {
   String commands[] = { "ATE0", "AT", "ATI", "AT+CSQ", "AT+CCID", "AT+CPIN?",
                         "AT+CREG?", "AT+CBC", "AT+CMGF=1", "AT+CFUN?", "AT+CSCLK?" };
@@ -142,6 +155,7 @@ void SIM800_init(void) {
   }
 }
 
+//web socket messaage handler
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
@@ -155,6 +169,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   }
 }
 
+//web socket connection handler
 void web_socket_handler(AsyncWebSocket *server, AsyncWebSocketClient *client,
                         AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
@@ -173,6 +188,7 @@ void web_socket_handler(AsyncWebSocket *server, AsyncWebSocketClient *client,
   }
 }
 
+//Read Sensor Data and Sent to web page
 void Read_Sensor(void) {
   int level_oil = analogRead(PIN_LEVEL_OIL);
   int temp_oil = analogRead(PIN_TEMP_OIL);
@@ -198,6 +214,7 @@ void Read_Sensor(void) {
   web_socket.textAll(output);
 }
 
+//Checking existence of the File System and file
 void initSPIFFS() {
   if (!SPIFFS.begin(false)) {
     Serial.println("An error has occurred while mounting SPIFFS");
@@ -212,7 +229,7 @@ void initSPIFFS() {
 }
 
 void setup() {
-  // esp_task_wtd_deinit();
+  //INPUT Sensor Pin
   pinMode(PIN_TEMP_OIL, INPUT);
   pinMode(PIN_TEMP_AIR, INPUT);
   pinMode(PIN_LEVEL_OIL, INPUT);
@@ -230,11 +247,13 @@ void setup() {
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
 
+  //add web socket connection event
   web_socket.onEvent(web_socket_handler);
-  server.addHandler(&web_socket);
+  server.addHandler(&web_socket);  //add web socket handler to web server route
 
   initSPIFFS();
 
+  //set static file to main address of server
   server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html").setCacheControl("no-cache, no-store, must-revalidate");
 
   //ACTIVATE GPS UART
@@ -242,7 +261,7 @@ void setup() {
   UART_GPS.begin(9600, SERIAL_8N1, RX_PIN_tTX_GPS, TX_PIN_tRX_GPS);
   Serial.println("UART GPS Started");
 
-  //ACTIVATE GPS UART
+  //ACTIVATE GSM UART
   //TIP : Baud rate = 9600
   UART_SIM800.begin(9600, SERIAL_8N1, RX_PIN_tTX_SIM800, TX_PIN_tRX_SIM800);
   Serial.println("UART SIM800 Started");
@@ -271,6 +290,7 @@ void loop() {
     _flash.putUInt("runtime", last_runtime);
   }
 
+  //Condition relative to the message
   if (wsNewMessage) {
 
     wsNewMessage = false;
@@ -278,21 +298,23 @@ void loop() {
     if (wsMessage == "message_test") {
       Serial.println("Message Test Triggered");
       wsMessage = "";
-      SEND_SMS("+989*********","TEST MESSAGE");  
-    }
-    else if(wsMessage == "call_test") {
+      SEND_SMS("+989*********", "TEST MESSAGE");
+    } else if (wsMessage == "call_test") {
       Serial.println("Call Test Triggered");
       wsMessage = "";
     } else if (wsMessage == "reset_runtime") {
       Serial.println("Reset Runtime Triggered");
+      _flash.putUInt("runtime", 0);
       wsMessage = "";
     }
   }
 
+  //Read Data from Uart sim800
   if (Serial.available()) {
     UART_SIM800.println(Serial.readStringUntil('\n'));
   }
 
+  //Response to sim800
   if (UART_SIM800.available()) {
     String response = UART_SIM800.readString();
     response = cleanResponse(response);

@@ -7,7 +7,7 @@
     </head>
 
     <body>
-        <!-- <div class="flex_column"> -->
+        
         <!--firsrbar -->
         <div class="header flex_row">
             <!-- account -->
@@ -17,7 +17,7 @@
          </div>
          <!-- setting -->
           <div class="setting flex_column center">
-           <div class="setting_icon"></div>
+           <div  class="setting_icon"></div>
            <h2>SETTING</h2>
           </div>
         </div>
@@ -136,17 +136,55 @@
             <button type="button"  id="reset_runtime" class="flex center"><img class="control_icon" src="icon/check_mark.png"></button>
        
         </div>
-        <div class="noting">
-           
-     </div>
+        <div class="noting"></div>
     </div>
-    <!-- </div> -->
-   
+    <!-- setting -->
+    <div class="setting_p _page flex_column align ">
+            <div class="set_box flex_row align">
+               <div id="wifi" class="end selector flex center"><h2>WIFI</h2></div>
+               <div id="gsm" class="end selector flex center"><h2>GSM</h2></div>
+               <div id="user" class="end selector flex center"><h2>USER</h2></div> 
+            </div>
+            <div id="wifi_menu" class="main_setting flex_column center">
+                <label for="ssid">WIFI NAME</label><br>
+                <input class="input" type="text" id="ssid" name="ssid"><br>
+                <label for="password">password</label><br>
+                <input class="input" type="password" id="password" name="password">
+                <button class="accept" type="button">Accept</button>
+            </div>
+            <div id="gsm_menu" class="main_setting flex_column center" style="background-color: rgb(43, 34, 97);">
+                <label for="ssid">Key word</label><br>
+                <input class="input" type="text" id="ssid" name="ssid"><br>
+                <label for="password">password</label><br>
+                <input class="input" type="password" id="password" name="password">
+                <button class="accept" type="button">Accept</button>
+            </div>
+            <div id="user_menu" class="main_setting" style="background-color: blueviolet;"></div>
+    </div>
+    <!-- profile -->
+    <div class="profile_p _page flex_column align">
+        <h1 style="font-size: 80px;">Hi dear welcome to unix</h1>
+        <div class="shell">
+            <h2>USAR NAME : <p3 style="color: blue;">ALI478QWE</p3></h2>
+            <h2>WIFI NAME : <p3 style="color: GREEN;">C++</p3></h2>
+            <h2>WIFI PAS: <p3  style="color: blue;">C++<p3 style="color: yellow;">(eye)</h3></h3></h2>
+            <h2>gsm key : <p3 style="color: rgb(117, 255, 117);">C++</p3></h2>
+            <h2>gsm PAS: <p3  style="color: rgb(143, 143, 255);">C++<p3 style="color: rgb(95, 95, 55);">(eye)</h3></h3></h2>
+            <h2 style="color: orange;">(: <p3 style="color: rgb(117, 255, 117);">developed by ALI478QWE</p3></h2>
+        </div>
+    </div>
+
+   <!-- javascript -->
+
     <script src="toggle.js"></script>
     <script>
-
+        const button_profile = document.querySelector(".profile");
+        const button_setting = document.querySelector(".setting_icon");
         const button_mode = document.querySelector(".mode");
         const img_mode = document.querySelector(".img_mode");
+        const wifi = document.getElementById("wifi");
+        const gsm = document.getElementById("gsm");
+        const user = document.getElementById("user");
 
         function theme() {
             // document.body.style.backgroundColor = this.isOn ? "#F8FAFC" :"#222831" ;
@@ -157,13 +195,46 @@
        
         }
 
-       
 
        const mode = new toggle(true, theme, button_mode);
        mode.click();
        const last_mode  = localStorage.getItem("dark_mode") === "true";
        mode.reload(last_mode);
+
+       const buttons = [wifi,gsm, user];
+       const menu = ["wifi_menu","gsm_menu","user_menu"];
+
+       function activate(activeBtn,active_menu) {
+         for(let x in buttons){
+            buttons[x].style.backgroundColor = "black";
+         }
+         for(let i in menu){
+           document.getElementById(menu[i]).style.visibility = "hidden";
+            document.getElementById(menu[i]).style.display = "none";
+        }
+        document.getElementById(active_menu).style.visibility = "visible";
+        document.getElementById(active_menu).style.display = "flex";
         
+        activeBtn.style.backgroundColor = "red";
+        }
+        activate(wifi,"wifi_menu");
+        button("wifi", () => {activate(wifi,"wifi_menu")});
+        button("gsm",  () => {activate(gsm,"gsm_menu")});
+        button("user",  () => {activate(user,"user_menu")});
+
+        function click_setting(){
+            document.querySelector(".setting_p").style.display = this.isOn ? "flex" : "none";
+        }
+        const setting = new toggle(true,click_setting,button_setting);
+        setting.click();
+        setting.reload();
+
+        function click_profile(){
+            document.querySelector(".profile_p").style.display = this.isOn ? "flex" : "none";
+        }
+        const profile = new toggle(true,click_profile,button_profile);
+        profile.click();
+        profile.reload();
 
         function updateUI(data) {
                 document.getElementById("level_oil").innerText = data.level_oil;

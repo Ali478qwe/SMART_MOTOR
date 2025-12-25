@@ -155,6 +155,14 @@
     margin: 0px px 0 18.3px;
 }
 
+.justify_center{
+    justify-content: center;
+}
+
+.between{
+    justify-content: space-between;
+}
+
 
 
 
@@ -410,4 +418,101 @@ h4{
     h1{
         font-size: 50px;
     }
+}
+
+
+._page{
+    
+    /* display: none; */
+    background-color:white;
+    height: 900px;
+    width: 900px;
+    position: absolute;
+    border-radius: 50px;
+}
+
+.selector{
+    /* margin: auto 100px; */
+    background-color: black;
+    height: 100px;
+    width: 400px;
+    border-radius:20px;
+    margin: 0 20px 0 20px;
+    color: var(--text-color-title-item-bar);
+    font-family: APEX;
+    font-size: 40px;
+  
+}
+
+.set_box{
+    background-color: #222831;
+    height: 150px;
+    width: 800px;
+    margin: 40px 0 20px 0;
+    border-radius: 30px;
+    
+}
+.title_name{
+    margin:0 0 0 40px;
+    color: white;
+}
+
+.main_setting{
+  position:static;
+  background-color: #222831;
+  height: 650px;
+  width: 800px;
+  border-radius: 30px;
+}
+
+.input{
+    height: 75px;
+    width: 500px;
+    border-radius: 5px;
+    border: none;
+    border: rgb(54, 54, 54) 10px solid ;
+    border-left: none;
+    border-right: none;
+    outline:none;
+    font-size: 40px;
+    text-indent: 30px;
+    font-family: APEX;
+    caret-color: rgb(0, 255, 98);
+    caret:20px;
+}
+.input:focus{
+    border-color: rgb(0, 255, 98);
+}
+label{
+    font-size: 70px;
+    font-family: APEX;
+    color: rgb(0,255,98);
+}
+.accept{
+    margin-top: 40px;
+    height: 75px;
+    width: 510px;
+    border:none;
+    border-radius: 5px;
+    font-size: 40px;
+    text-indent: 30px;
+    font-family: APEX;
+}
+.accept:focus{
+    background-color: rgb(0, 255, 98);
+    color: white;
+}
+.shell{
+    height: 760px;
+    width: 800px;
+    background-color: black;
+    border-radius: 20px;
+    color: white;
+    font-size: 30px;
+    text-indent: 50px;
+    line-height: 20px;
+}
+
+#m:hover{
+    color: red;
 }

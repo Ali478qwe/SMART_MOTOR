@@ -163,6 +163,10 @@
     justify-content: space-between;
 }
 
+.start{
+    justify-content: left;
+}
+
 
 
 
@@ -489,11 +493,12 @@ label{
     color: rgb(0,255,98);
 }
 .accept{
-    margin-top: 40px;
-    height: 75px;
-    width: 510px;
+    margin-left: 10px;
+    height: 95px;
+    width: 95px;
     border:none;
-    border-radius: 5px;
+    border-radius: 15px;
+    border: rgb(54, 54, 54) 5px solid ;
     font-size: 40px;
     text-indent: 30px;
     font-family: APEX;
